@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from './components/Button/Button';
 import { TestimonialCard } from './components/TestimonialCard/TestimonialCard';
 import { BlogCard } from './components/BlogCard/BlogCard';
+import { TextInput } from './components/TextInput/TextInput';
 import styled from 'styled-components';
 
 const AppContainer = styled.div`
@@ -26,6 +27,11 @@ const Grid = styled.div`
   gap: 2rem;
 `;
 
+const FormSection = styled.div`
+  max-width: 400px;
+  margin-bottom: 2rem;
+`;
+
 export const App: React.FC = () => {
   return (
     <AppContainer>
@@ -38,6 +44,35 @@ export const App: React.FC = () => {
           <Button variant="tertiary">Tertiary Button</Button>
           <Button variant="link">Link Button</Button>
         </div>
+      </Section>
+
+      <Section>
+        <SectionTitle>Form Inputs</SectionTitle>
+        <FormSection>
+          <TextInput
+            label="Username"
+            placeholder="Enter your username"
+            hint="Username must be at least 3 characters long"
+          />
+          <TextInput
+            label="Email"
+            placeholder="Enter your email"
+            error="Please enter a valid email address"
+            startIcon={<span>📧</span>}
+          />
+          <TextInput
+            label="Password"
+            type="password"
+            placeholder="Enter your password"
+            endIcon={<span>👁️</span>}
+          />
+          <TextInput
+            label="Disabled Input"
+            placeholder="This input is disabled"
+            disabled
+            value="Disabled value"
+          />
+        </FormSection>
       </Section>
 
       <Section>
