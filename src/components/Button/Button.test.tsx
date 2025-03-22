@@ -31,7 +31,7 @@ describe('Button', () => {
 
   it('renders with link variant', () => {
     render(<Button variant="link">Click me</Button>);
-    const button = screen.getByRole('button');
+    const button = screen.getByRole('link');
     expect(button).toHaveTextContent('Click me');
   });
 
@@ -131,5 +131,74 @@ describe('Button', () => {
     render(<Button className="custom-class">Click me</Button>);
     const button = screen.getByRole('button');
     expect(button.getAttribute('class')).toContain('custom-class');
+  });
+
+  // Accessibility tests
+  describe('Accessibility', () => {
+    it('is focusable via keyboard', () => {
+      render(<Button>Click me</Button>);
+      const button = screen.getByRole('button');
+      expect(button).toHaveAttribute('tabindex', '0');
+    });
+
+    it('can be focused and triggered with keyboard', async () => {
+      const handleClick = vi.fn();
+      render(<Button onClick={handleClick}>Click me</Button>);
+      const button = screen.getByRole('button');
+
+      // Focus the button
+      button.focus();
+      expect(button).toHaveFocus();
+
+      // Press Enter
+      await userEvent.keyboard('{Enter}');
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders icon-only button with aria-label', () => {
+      render(
+        <Button isIconOnly ariaLabel="Search">
+          🔍
+        </Button>
+      );
+      const button = screen.getByRole('button', { name: 'Search' });
+      expect(button).toBeInTheDocument();
+    });
+
+    it('warns when icon-only button is missing aria-label', () => {
+      const consoleSpy = vi.spyOn(console, 'warn');
+      render(<Button isIconOnly>🔍</Button>);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Icon-only buttons should have an aria-label for accessibility'
+      );
+      consoleSpy.mockRestore();
+    });
+
+    it('marks icons as decorative with aria-hidden', () => {
+      render(
+        <Button leftIcon="←" rightIcon="→">
+          Click me
+        </Button>
+      );
+      const button = screen.getByRole('button');
+      const leftIcon = button.querySelector('.button-icon-left');
+      const rightIcon = button.querySelector('.button-icon-right');
+
+      expect(leftIcon).toHaveAttribute('aria-hidden', 'true');
+      expect(rightIcon).toHaveAttribute('aria-hidden', 'true');
+    });
+
+    it('renders link variant with correct role', () => {
+      render(<Button variant="link">Click me</Button>);
+      const button = screen.getByRole('link');
+      expect(button).toBeInTheDocument();
+    });
+
+    it('is not focusable when disabled', () => {
+      render(<Button disabled>Click me</Button>);
+      const button = screen.getByRole('button');
+      expect(button).toHaveAttribute('tabindex', '-1');
+      expect(button).toBeDisabled();
+    });
   });
 });

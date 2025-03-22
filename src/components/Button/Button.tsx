@@ -11,6 +11,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   isIconOnly?: boolean;
+  ariaLabel?: string; // For icon-only buttons
 }
 
 const StyledButton = styled.button<ButtonProps>`
@@ -24,6 +25,15 @@ const StyledButton = styled.button<ButtonProps>`
   cursor: pointer;
   border: none;
   outline: none;
+  position: relative;
+
+  /* Focus styles for keyboard navigation */
+  &:focus,
+  &:focus-visible {
+    outline: 2px solid rgba(59, 130, 246, 0.5) !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5) !important;
+  }
 
   /* Size variants */
   ${({ size = 'medium' }) => {
@@ -61,9 +71,6 @@ const StyledButton = styled.button<ButtonProps>`
           &:hover:not(:disabled) {
             background-color: #2563eb;
           }
-          &:focus {
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
-          }
         `;
       case 'secondary':
         return `
@@ -71,9 +78,6 @@ const StyledButton = styled.button<ButtonProps>`
           color: #374151;
           &:hover:not(:disabled) {
             background-color: #d1d5db;
-          }
-          &:focus {
-            box-shadow: 0 0 0 3px rgba(229, 231, 235, 0.5);
           }
         `;
       case 'tertiary':
@@ -84,9 +88,6 @@ const StyledButton = styled.button<ButtonProps>`
           &:hover:not(:disabled) {
             background-color: #eff6ff;
           }
-          &:focus {
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
-          }
         `;
       case 'destructive':
         return `
@@ -94,9 +95,6 @@ const StyledButton = styled.button<ButtonProps>`
           color: white;
           &:hover:not(:disabled) {
             background-color: #dc2626;
-          }
-          &:focus {
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.5);
           }
         `;
       case 'link':
@@ -106,9 +104,6 @@ const StyledButton = styled.button<ButtonProps>`
           padding: 0;
           &:hover:not(:disabled) {
             text-decoration: underline;
-          }
-          &:focus {
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
           }
         `;
     }
@@ -136,13 +131,37 @@ export const Button: React.FC<ButtonProps> = ({
   leftIcon,
   rightIcon,
   isIconOnly = false,
+  ariaLabel,
+  disabled,
   ...props
 }) => {
+  // Ensure icon-only buttons have an aria-label
+  if (isIconOnly && !ariaLabel) {
+    console.warn('Icon-only buttons should have an aria-label for accessibility');
+  }
+
   return (
-    <StyledButton variant={variant} size={size} isIconOnly={isIconOnly} {...props}>
-      {leftIcon && <span className="button-icon-left">{leftIcon}</span>}
+    <StyledButton
+      variant={variant}
+      size={size}
+      isIconOnly={isIconOnly}
+      aria-label={ariaLabel}
+      role={variant === 'link' ? 'link' : 'button'}
+      tabIndex={disabled ? -1 : 0}
+      disabled={disabled}
+      {...props}
+    >
+      {leftIcon && (
+        <span className="button-icon-left" aria-hidden="true">
+          {leftIcon}
+        </span>
+      )}
       {!isIconOnly && children}
-      {rightIcon && <span className="button-icon-right">{rightIcon}</span>}
+      {rightIcon && (
+        <span className="button-icon-right" aria-hidden="true">
+          {rightIcon}
+        </span>
+      )}
     </StyledButton>
   );
 };
