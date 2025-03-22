@@ -1,6 +1,6 @@
 {
   "name": "mini-component-kit",
-  "private": true,
+  "private": false,
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -18,7 +18,8 @@
     "build-storybook": "storybook build",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -69,5 +70,23 @@
       "eslint --fix",
       "prettier --write"
     ]
-  }
+  },
+  "keywords": [
+    "react",
+    "components",
+    "ui",
+    "typescript",
+    "styled-components",
+    "tailwindcss"
+  ],
+  "author": "leesown",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lhmson/mini-component-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lhmson/mini-component-kit/issues"
+  },
+  "homepage": "https://github.com/lhmson/mini-component-kit#readme"
 }
