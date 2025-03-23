@@ -1,2 +1,2 @@
-export * from './BlogCard';
+export { BlogCard } from './BlogCard';
 export type { BlogCardProps } from './BlogCard';
