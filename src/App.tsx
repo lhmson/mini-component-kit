@@ -1,6 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Button, TextInput, BlogCard, TestimonialCard, ProfileCard } from './components';
+import {
+  Button,
+  TextInput,
+  BlogCard,
+  TestimonialCard,
+  ProfileCard,
+  FeaturedCollections,
+} from './components';
 
 const AppContainer = styled.div`
   max-width: 1200px;
@@ -113,6 +120,30 @@ const testimonials = [
   },
 ];
 
+const mockCollections = [
+  {
+    id: '1',
+    name: 'Summer Collection',
+    description: 'Discover our latest summer styles perfect for the beach and beyond.',
+    imageUrl:
+      'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    id: '2',
+    name: 'Autumn Essentials',
+    description: 'Cozy and comfortable pieces for the changing seasons.',
+    imageUrl:
+      'https://images.unsplash.com/photo-1511401139252-f158d3209c17?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    id: '3',
+    name: 'Accessories',
+    description: 'Complete your look with our curated selection of accessories.',
+    imageUrl:
+      'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80',
+  },
+];
+
 export const App: React.FC = () => {
   return (
     <AppContainer>
@@ -201,6 +232,11 @@ export const App: React.FC = () => {
             }}
           />
         </ComponentGrid>
+      </Section>
+
+      <Section>
+        <SectionTitle>Featured Collections</SectionTitle>
+        <FeaturedCollections collections={mockCollections} />
       </Section>
     </AppContainer>
   );
