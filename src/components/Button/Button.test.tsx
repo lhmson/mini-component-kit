@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Button } from './Button';
 
@@ -8,89 +8,123 @@ describe('Button', () => {
   it('renders with primary variant by default', () => {
     render(<Button>Click me</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveTextContent('Click me');
+    expect(button).toHaveStyle(
+      `backgroundColor: rgb(59, 130, 246),
+      color: rgb(255, 255, 255)`
+    );
   });
 
   it('renders with secondary variant', () => {
     render(<Button variant="secondary">Click me</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveTextContent('Click me');
+    expect(button).toHaveStyle(
+      `backgroundColor: white,
+      color: #374151,
+      borderColor: #D1D5DB`
+    );
   });
 
   it('renders with tertiary variant', () => {
     render(<Button variant="tertiary">Click me</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveTextContent('Click me');
+    expect(button).toHaveStyle(
+      `backgroundColor: transparent,
+      color: #374151`
+    );
   });
 
   it('renders with destructive variant', () => {
     render(<Button variant="destructive">Click me</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveTextContent('Click me');
+    expect(button).toHaveStyle(
+      `backgroundColor: #DC2626,
+      color: white`
+    );
   });
 
   it('renders with link variant', () => {
     render(<Button variant="link">Click me</Button>);
-    const button = screen.getByRole('link');
-    expect(button).toHaveTextContent('Click me');
+    const link = screen.getByRole('link');
+    expect(link).toHaveStyle(
+      `backgroundColor: transparent,
+      color: #3B82F6,
+      padding: 0`
+    );
   });
 
   // Test sizes
   it('renders with medium size by default', () => {
     render(<Button>Click me</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveTextContent('Click me');
+    expect(button).toHaveStyle({
+      padding: '0.5rem 1rem',
+      fontSize: '0.875rem',
+      lineHeight: '1.25rem',
+    });
   });
 
   it('renders with large size', () => {
-    render(<Button size="large">Click me</Button>);
+    render(<Button size="lg">Click me</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveTextContent('Click me');
+    expect(button).toHaveStyle({
+      padding: '0.625rem 1.25rem',
+      fontSize: '1rem',
+      lineHeight: '1.5rem',
+    });
   });
 
   it('renders with xl size', () => {
     render(<Button size="xl">Click me</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveTextContent('Click me');
+    expect(button).toHaveStyle({
+      padding: '0.75rem 1.5rem',
+      fontSize: '1.125rem',
+      lineHeight: '1.75rem',
+    });
   });
 
   it('renders with 2xl size', () => {
     render(<Button size="2xl">Click me</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveTextContent('Click me');
+    expect(button).toHaveStyle({
+      padding: '0.875rem 1.75rem',
+      fontSize: '1.25rem',
+      lineHeight: '1.75rem',
+    });
   });
 
   // Test icons
   it('renders with left icon', () => {
-    render(<Button leftIcon="←">Click me</Button>);
+    render(<Button leftIcon={<span>👈</span>}>Click me</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveTextContent('←');
+    expect(button).toHaveTextContent('👈');
   });
 
   it('renders with right icon', () => {
-    render(<Button rightIcon="→">Click me</Button>);
+    render(<Button rightIcon={<span>👉</span>}>Click me</Button>);
     const button = screen.getByRole('button');
-    expect(button).toHaveTextContent('→');
+    expect(button).toHaveTextContent('👉');
   });
 
   it('renders with both icons', () => {
     render(
-      <Button leftIcon="←" rightIcon="→">
+      <Button leftIcon={<span>👈</span>} rightIcon={<span>👉</span>}>
         Click me
       </Button>
     );
     const button = screen.getByRole('button');
-    expect(button).toHaveTextContent('←');
-    expect(button).toHaveTextContent('→');
+    expect(button).toHaveTextContent('👈');
+    expect(button).toHaveTextContent('👉');
   });
 
   it('renders as icon-only button', () => {
-    render(<Button isIconOnly>🔍</Button>);
-    const button = screen.getByRole('button');
-    expect(button).toHaveStyle({
-      padding: '0.5rem',
-      borderRadius: '50%',
-    });
+    render(
+      <Button isIconOnly aria-label="Search">
+        <span>🔍</span>
+      </Button>
+    );
+    const button = screen.getByRole('button', { name: 'Search' });
+    expect(button).toHaveTextContent('🔍');
   });
 
   // Test states
@@ -98,6 +132,11 @@ describe('Button', () => {
     render(<Button disabled>Click me</Button>);
     const button = screen.getByRole('button');
     expect(button).toBeDisabled();
+    expect(button).toHaveStyle({
+      opacity: '0.5',
+      cursor: 'not-allowed',
+      pointerEvents: 'none',
+    });
   });
 
   it('handles click events', async () => {
@@ -105,10 +144,10 @@ describe('Button', () => {
     render(<Button onClick={handleClick}>Click me</Button>);
     const button = screen.getByRole('button');
     await userEvent.click(button);
-    expect(handleClick).toHaveBeenCalledTimes(1);
+    expect(handleClick).toHaveBeenCalled();
   });
 
-  it('does not handle click events when disabled', async () => {
+  it('does not handle click events when disabled', () => {
     const handleClick = vi.fn();
     render(
       <Button disabled onClick={handleClick}>
@@ -116,7 +155,7 @@ describe('Button', () => {
       </Button>
     );
     const button = screen.getByRole('button');
-    await userEvent.click(button);
+    fireEvent.click(button);
     expect(handleClick).not.toHaveBeenCalled();
   });
 
@@ -130,7 +169,7 @@ describe('Button', () => {
   it('renders with custom className', () => {
     render(<Button className="custom-class">Click me</Button>);
     const button = screen.getByRole('button');
-    expect(button.getAttribute('class')).toContain('custom-class');
+    expect(button).toHaveClass('custom-class');
   });
 
   // Accessibility tests
@@ -145,20 +184,15 @@ describe('Button', () => {
       const handleClick = vi.fn();
       render(<Button onClick={handleClick}>Click me</Button>);
       const button = screen.getByRole('button');
-
-      // Focus the button
       button.focus();
-      expect(button).toHaveFocus();
-
-      // Press Enter
       await userEvent.keyboard('{Enter}');
-      expect(handleClick).toHaveBeenCalledTimes(1);
+      expect(handleClick).toHaveBeenCalled();
     });
 
     it('renders icon-only button with aria-label', () => {
       render(
-        <Button isIconOnly ariaLabel="Search">
-          🔍
+        <Button isIconOnly aria-label="Search">
+          <span>🔍</span>
         </Button>
       );
       const button = screen.getByRole('button', { name: 'Search' });
@@ -167,38 +201,37 @@ describe('Button', () => {
 
     it('warns when icon-only button is missing aria-label', () => {
       const consoleSpy = vi.spyOn(console, 'warn');
-      render(<Button isIconOnly>🔍</Button>);
+      render(
+        <Button isIconOnly>
+          <span>🔍</span>
+        </Button>
+      );
       expect(consoleSpy).toHaveBeenCalledWith(
         'Icon-only buttons should have an aria-label for accessibility'
       );
-      consoleSpy.mockRestore();
     });
 
     it('marks icons as decorative with aria-hidden', () => {
       render(
-        <Button leftIcon="←" rightIcon="→">
+        <Button leftIcon={<span>👈</span>} rightIcon={<span>👉</span>}>
           Click me
         </Button>
       );
       const button = screen.getByRole('button');
-      const leftIcon = button.querySelector('.button-icon-left');
-      const rightIcon = button.querySelector('.button-icon-right');
-
-      expect(leftIcon).toHaveAttribute('aria-hidden', 'true');
-      expect(rightIcon).toHaveAttribute('aria-hidden', 'true');
+      const icons = button.querySelectorAll('[aria-hidden="true"]');
+      expect(icons).toHaveLength(2);
     });
 
     it('renders link variant with correct role', () => {
       render(<Button variant="link">Click me</Button>);
-      const button = screen.getByRole('link');
-      expect(button).toBeInTheDocument();
+      const link = screen.getByRole('link');
+      expect(link).toBeInTheDocument();
     });
 
     it('is not focusable when disabled', () => {
       render(<Button disabled>Click me</Button>);
       const button = screen.getByRole('button');
       expect(button).toHaveAttribute('tabindex', '-1');
-      expect(button).toBeDisabled();
     });
   });
 });

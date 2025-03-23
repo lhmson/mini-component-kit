@@ -9,13 +9,24 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
+    include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     coverage: {
+      provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'src/test/setup.ts'],
+      exclude: [
+        'node_modules/',
+        'src/test/setup.ts',
+        '**/*.d.ts',
+        '**/*.test.{js,ts,jsx,tsx}',
+        '**/*.spec.{js,ts,jsx,tsx}',
+      ],
     },
     deps: {
-      inline: [/@testing-library\/react/],
+      optimizer: {
+        web: {
+          include: ['@testing-library/react', '@testing-library/user-event'],
+        },
+      },
     },
   },
   resolve: {

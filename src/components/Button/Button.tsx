@@ -1,167 +1,252 @@
 import React from 'react';
-import styled from 'styled-components';
-
-export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'destructive' | 'link';
-export type ButtonSize = 'medium' | 'large' | 'xl' | '2xl';
-export type ButtonState = 'normal' | 'hover' | 'focus' | 'disabled';
+import styled, { css } from 'styled-components';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'destructive' | 'link';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   isIconOnly?: boolean;
-  ariaLabel?: string; // For icon-only buttons
+  'aria-label'?: string;
 }
 
-const StyledButton = styled.button<ButtonProps>`
+interface StyledButtonProps extends Omit<ButtonProps, 'leftIcon' | 'rightIcon' | 'isIconOnly'> {
+  $disabled?: boolean;
+}
+
+interface StyledLinkProps
+  extends Omit<ButtonProps, keyof React.ButtonHTMLAttributes<HTMLButtonElement>> {
+  $disabled?: boolean;
+}
+
+const StyledButton = styled.button<StyledButtonProps>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 0.375rem;
   font-weight: 500;
-  transition: all 0.2s ease-in-out;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
   cursor: pointer;
-  border: none;
+  border: 1px solid transparent;
   outline: none;
-  position: relative;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 
-  /* Focus styles for keyboard navigation */
-  &:focus,
-  &:focus-visible {
-    outline: 2px solid rgba(59, 130, 246, 0.5) !important;
-    outline-offset: 2px !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5) !important;
-  }
-
-  /* Size variants */
-  ${({ size = 'medium' }) => {
-    switch (size) {
-      case 'medium':
-        return `
-          padding: 0.5rem 1rem;
-          font-size: 0.875rem;
-        `;
-      case 'large':
-        return `
-          padding: 0.75rem 1.5rem;
-          font-size: 1rem;
-        `;
-      case 'xl':
-        return `
-          padding: 1rem 2rem;
-          font-size: 1.125rem;
-        `;
-      case '2xl':
-        return `
-          padding: 1.25rem 2.5rem;
-          font-size: 1.25rem;
-        `;
-    }
-  }}
-
-  /* Variant styles */
   ${({ variant = 'primary' }) => {
     switch (variant) {
-      case 'primary':
-        return `
-          background-color: #3b82f6;
-          color: white;
-          &:hover:not(:disabled) {
-            background-color: #2563eb;
-          }
-        `;
       case 'secondary':
-        return `
-          background-color: #e5e7eb;
+        return css`
+          background-color: white;
           color: #374151;
-          &:hover:not(:disabled) {
-            background-color: #d1d5db;
+          border-color: #d1d5db;
+          &:hover {
+            background-color: #f9fafb;
+            border-color: #9ca3af;
+          }
+          &:focus {
+            box-shadow: 0 0 0 2px #e5e7eb;
           }
         `;
       case 'tertiary':
-        return `
+        return css`
           background-color: transparent;
-          color: #3b82f6;
-          border: 1px solid #3b82f6;
-          &:hover:not(:disabled) {
-            background-color: #eff6ff;
+          color: #374151;
+          &:hover {
+            background-color: #f3f4f6;
+          }
+          &:focus {
+            box-shadow: 0 0 0 2px #e5e7eb;
           }
         `;
       case 'destructive':
-        return `
-          background-color: #ef4444;
+        return css`
+          background-color: #dc2626;
           color: white;
-          &:hover:not(:disabled) {
-            background-color: #dc2626;
+          &:hover {
+            background-color: #b91c1c;
+          }
+          &:focus {
+            box-shadow: 0 0 0 2px #fee2e2;
           }
         `;
       case 'link':
-        return `
+        return css`
           background-color: transparent;
           color: #3b82f6;
           padding: 0;
-          &:hover:not(:disabled) {
+          &:hover {
             text-decoration: underline;
+          }
+          &:focus {
+            box-shadow: none;
+          }
+        `;
+      default:
+        return css`
+          background-color: #3b82f6;
+          color: white;
+          &:hover {
+            background-color: #2563eb;
+          }
+          &:focus {
+            box-shadow: 0 0 0 2px #dbeafe;
           }
         `;
     }
   }}
 
-  /* Disabled state */
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  ${({ size = 'md' }) => {
+    switch (size) {
+      case 'sm':
+        return css`
+          padding: 0.375rem 0.75rem;
+          font-size: 0.75rem;
+          line-height: 1rem;
+        `;
+      case 'lg':
+        return css`
+          padding: 0.625rem 1.25rem;
+          font-size: 1rem;
+          line-height: 1.5rem;
+        `;
+      case 'xl':
+        return css`
+          padding: 0.75rem 1.5rem;
+          font-size: 1.125rem;
+          line-height: 1.75rem;
+        `;
+      case '2xl':
+        return css`
+          padding: 0.875rem 1.75rem;
+          font-size: 1.25rem;
+          line-height: 1.75rem;
+        `;
+      default:
+        return css`
+          padding: 0.5rem 1rem;
+          font-size: 0.875rem;
+          line-height: 1.25rem;
+        `;
+    }
+  }}
+
+  ${({ $disabled }) =>
+    $disabled &&
+    css`
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    `}
+`;
+
+const StyledLink = styled.a<StyledLinkProps>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: #3b82f6;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+
+  &:hover {
+    text-decoration: underline;
   }
 
-  /* Icon-only styles */
-  ${({ isIconOnly }) =>
-    isIconOnly &&
-    `
-    padding: 0.5rem;
-    border-radius: 50%;
-  `}
+  &:focus {
+    outline: none;
+  }
+
+  ${({ $disabled }) =>
+    $disabled &&
+    css`
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    `}
+`;
+
+const IconWrapper = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
 `;
 
 export const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',
-  size = 'medium',
+  size = 'md',
   leftIcon,
   rightIcon,
-  isIconOnly = false,
-  ariaLabel,
+  isIconOnly,
   disabled,
+  'aria-label': ariaLabel,
   ...props
 }) => {
-  // Ensure icon-only buttons have an aria-label
-  if (isIconOnly && !ariaLabel) {
-    console.warn('Icon-only buttons should have an aria-label for accessibility');
+  // Warn if icon-only button is missing aria-label
+  React.useEffect(() => {
+    if (isIconOnly && !ariaLabel) {
+      console.warn('Icon-only buttons should have an aria-label for accessibility');
+    }
+  }, [isIconOnly, ariaLabel]);
+
+  const buttonContent = (
+    <>
+      {leftIcon && <IconWrapper aria-hidden="true">{leftIcon}</IconWrapper>}
+      {isIconOnly ? <IconWrapper aria-hidden="true">{children}</IconWrapper> : children}
+      {rightIcon && <IconWrapper aria-hidden="true">{rightIcon}</IconWrapper>}
+    </>
+  );
+
+  const commonProps = {
+    'aria-label': ariaLabel,
+    tabIndex: disabled ? -1 : 0,
+    $disabled: disabled,
+    disabled,
+  };
+
+  if (variant === 'link') {
+    // Create a new props object with only the props that are valid for anchor elements
+    const linkProps = {
+      ...commonProps,
+      variant,
+      size,
+      className: props.className,
+      style: props.style,
+    };
+
+    // Handle click and keydown events separately to avoid type conflicts
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (props.onClick) {
+        props.onClick(e as unknown as React.MouseEvent<HTMLButtonElement>);
+      }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLAnchorElement>) => {
+      if (props.onKeyDown) {
+        props.onKeyDown(e as unknown as React.KeyboardEvent<HTMLButtonElement>);
+      }
+    };
+
+    return (
+      <StyledLink role="link" {...linkProps} onClick={handleClick} onKeyDown={handleKeyDown}>
+        {buttonContent}
+      </StyledLink>
+    );
   }
 
   return (
-    <StyledButton
-      variant={variant}
-      size={size}
-      isIconOnly={isIconOnly}
-      aria-label={ariaLabel}
-      role={variant === 'link' ? 'link' : 'button'}
-      tabIndex={disabled ? -1 : 0}
-      disabled={disabled}
-      {...props}
-    >
-      {leftIcon && (
-        <span className="button-icon-left" aria-hidden="true">
-          {leftIcon}
-        </span>
-      )}
-      {!isIconOnly && children}
-      {rightIcon && (
-        <span className="button-icon-right" aria-hidden="true">
-          {rightIcon}
-        </span>
-      )}
+    <StyledButton {...props} {...commonProps} variant={variant} size={size}>
+      {buttonContent}
     </StyledButton>
   );
 };
+
+Button.displayName = 'Button';

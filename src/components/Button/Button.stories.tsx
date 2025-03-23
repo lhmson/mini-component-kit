@@ -1,155 +1,120 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from './Button';
 
-const meta = {
+const meta: Meta<typeof Button> = {
   title: 'Components/Button',
   component: Button,
   parameters: {
     layout: 'centered',
   },
   tags: ['autodocs'],
-  argTypes: {
-    variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'tertiary', 'destructive', 'link'],
-    },
-    size: {
-      control: 'select',
-      options: ['medium', 'large', 'xl', '2xl'],
-    },
-    leftIcon: {
-      control: 'text',
-    },
-    rightIcon: {
-      control: 'text',
-    },
-    isIconOnly: {
-      control: 'boolean',
-    },
-  },
-} satisfies Meta<typeof Button>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof Button>;
 
-// Basic button with different variants
 export const Primary: Story = {
   args: {
-    children: 'Primary Button',
-    variant: 'primary',
+    children: 'Button',
   },
 };
 
 export const Secondary: Story = {
   args: {
-    children: 'Secondary Button',
     variant: 'secondary',
+    children: 'Button',
   },
 };
 
 export const Tertiary: Story = {
   args: {
-    children: 'Tertiary Button',
     variant: 'tertiary',
+    children: 'Button',
   },
 };
 
 export const Destructive: Story = {
   args: {
-    children: 'Destructive Button',
     variant: 'destructive',
+    children: 'Button',
   },
 };
 
 export const Link: Story = {
   args: {
-    children: 'Link Button',
     variant: 'link',
+    children: 'Button',
   },
 };
 
-// Size variants
+export const Small: Story = {
+  args: {
+    size: 'sm',
+    children: 'Button',
+  },
+};
+
 export const Medium: Story = {
   args: {
-    children: 'Medium Button',
-    size: 'medium',
+    size: 'md',
+    children: 'Button',
   },
 };
 
 export const Large: Story = {
   args: {
-    children: 'Large Button',
-    size: 'large',
+    size: 'lg',
+    children: 'Button',
   },
 };
 
 export const ExtraLarge: Story = {
   args: {
-    children: 'Extra Large Button',
     size: 'xl',
+    children: 'Button',
   },
 };
 
 export const TwoExtraLarge: Story = {
   args: {
-    children: '2XL Button',
     size: '2xl',
+    children: 'Button',
   },
 };
 
-// Icon variants
 export const WithLeftIcon: Story = {
   args: {
-    children: 'Button with Left Icon',
     leftIcon: '←',
+    children: 'Button',
   },
 };
 
 export const WithRightIcon: Story = {
   args: {
-    children: 'Button with Right Icon',
     rightIcon: '→',
+    children: 'Button',
   },
 };
 
 export const WithBothIcons: Story = {
   args: {
-    children: 'Button with Both Icons',
     leftIcon: '←',
     rightIcon: '→',
+    children: 'Button',
   },
 };
 
 export const IconOnly: Story = {
   args: {
-    children: '🔍',
     isIconOnly: true,
+    'aria-label': 'Search',
+    children: '🔍',
   },
 };
 
-// States
 export const Disabled: Story = {
   args: {
-    children: 'Disabled Button',
     disabled: true,
-  },
-};
-
-// Interactive states
-export const Hover: Story = {
-  args: {
-    children: 'Hover Me',
-  },
-  parameters: {
-    pseudo: { hover: true },
-  },
-};
-
-export const Focus: Story = {
-  args: {
-    children: 'Focus Me',
-  },
-  parameters: {
-    pseudo: { focus: true },
+    children: 'Button',
   },
 };

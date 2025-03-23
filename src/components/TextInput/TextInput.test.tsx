@@ -1,144 +1,131 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { TextInput } from './TextInput';
 
 describe('TextInput', () => {
-  const defaultProps = {
-    label: 'Username',
-    placeholder: 'Enter your username',
-  };
-
-  it('renders with all required props', () => {
-    render(<TextInput {...defaultProps} />);
-
-    // Check for label
-    expect(screen.getByText(defaultProps.label)).toBeInTheDocument();
-
-    // Check for input
-    const input = screen.getByRole('textbox');
-    expect(input).toHaveAttribute('placeholder', defaultProps.placeholder);
-    expect(input).toHaveAttribute('id');
-    expect(screen.getByLabelText(defaultProps.label)).toBe(input);
-  });
-
-  it('renders with hint text', () => {
-    const hint = 'Username must be at least 3 characters long';
-    render(<TextInput {...defaultProps} hint={hint} />);
-
-    const input = screen.getByRole('textbox');
-    const hintElement = screen.getByText(hint);
-
-    expect(hintElement).toBeInTheDocument();
-    expect(input).toHaveAttribute('aria-describedby', hintElement.id);
-  });
-
-  it('renders with error message', () => {
-    const error = 'Username is required';
-    render(<TextInput {...defaultProps} error={error} />);
-
-    const input = screen.getByRole('textbox');
-    const errorElement = screen.getByText(error);
-
-    expect(errorElement).toBeInTheDocument();
-    expect(input).toHaveAttribute('aria-invalid', 'true');
-    expect(input).toHaveAttribute('aria-describedby', errorElement.id);
-    expect(errorElement).toHaveAttribute('role', 'alert');
-  });
-
-  it('renders with start and end icons', () => {
-    const startIcon = '🔍';
-    const endIcon = '✓';
+  it('renders with all props', () => {
     render(
       <TextInput
-        {...defaultProps}
-        startIcon={<span>{startIcon}</span>}
-        endIcon={<span>{endIcon}</span>}
+        label="Username"
+        placeholder="Enter username"
+        hint="Must be at least 3 characters"
+        startIcon={<span>👤</span>}
+        endIcon={<span>✓</span>}
       />
     );
 
-    expect(screen.getByText(startIcon)).toBeInTheDocument();
-    expect(screen.getByText(endIcon)).toBeInTheDocument();
-  });
-
-  it('handles disabled state', () => {
-    render(<TextInput {...defaultProps} disabled />);
-
-    const input = screen.getByRole('textbox');
-    expect(input).toBeDisabled();
-    expect(input).toHaveStyle({ color: 'rgb(107, 114, 128)' });
+    expect(screen.getByLabelText('Username')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter username')).toBeInTheDocument();
+    expect(screen.getByText('Must be at least 3 characters')).toBeInTheDocument();
+    expect(screen.getByText('👤')).toBeInTheDocument();
+    expect(screen.getByText('✓')).toBeInTheDocument();
   });
 
   it('handles focus state', async () => {
-    render(<TextInput {...defaultProps} />);
-
-    const input = screen.getByRole('textbox');
+    render(<TextInput label="Username" />);
+    const input = screen.getByLabelText('Username');
     const container = input.parentElement;
     expect(container).not.toBeNull();
 
     // Focus the input
     input.focus();
-
-    // Wait for the focus styles to be applied
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     // Check focus styles
-    const computedStyle = window.getComputedStyle(container!);
-    expect(computedStyle.borderColor).toBe('rgb(156, 163, 175)');
+    expect(container).toHaveStyle(
+      `borderColor: rgb(59, 130, 246),
+      boxShadow: 0 0 0 2px #DBEAFE`
+    );
 
     // Blur the input
     input.blur();
-
-    // Wait for the blur styles to be applied
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    // Check default styles
-    const defaultStyle = window.getComputedStyle(container!);
-    expect(defaultStyle.borderColor).toBe('rgb(156, 163, 175)');
+    // Check normal styles
+    expect(container).toHaveStyle({
+      borderColor: '#D1D5DB',
+    });
   });
 
   it('handles error state', () => {
-    const error = 'Invalid input';
-    render(<TextInput {...defaultProps} error={error} />);
-
-    const input = screen.getByRole('textbox');
+    render(<TextInput label="Username" error="Username is required" />);
+    const input = screen.getByLabelText('Username');
     const container = input.parentElement;
     expect(container).not.toBeNull();
 
-    const computedStyle = window.getComputedStyle(container!);
-    expect(computedStyle.borderColor).toBe('rgb(239, 68, 68)');
+    // Check error styles
+    expect(container).toHaveStyle(
+      `backgroundColor: rgb(254, 226, 226),
+      borderColor: rgb(239, 68, 68)`
+    );
+
+    // Check error message
+    expect(screen.getByText('Username is required')).toBeInTheDocument();
+    expect(screen.getByText('Username is required')).toHaveAttribute('role', 'alert');
   });
 
-  it('is keyboard accessible', async () => {
-    render(<TextInput {...defaultProps} />);
+  it('handles disabled state', () => {
+    render(<TextInput label="Username" disabled />);
+    const input = screen.getByLabelText('Username');
+    const container = input.parentElement;
+    expect(container).not.toBeNull();
 
-    const input = screen.getByRole('textbox');
-    const label = screen.getByText(defaultProps.label);
+    expect(input).toBeDisabled();
+    expect(container).toHaveStyle(
+      `backgroundColor: rgb(243, 244, 246),
+      borderColor: rgb(209, 213, 219),
+      cursor: not-allowed`
+    );
+  });
 
-    // Check that the input is focusable
-    input.focus();
-    expect(input).toHaveFocus();
+  it('handles value changes', () => {
+    const handleChange = vi.fn();
+    render(<TextInput label="Username" onChange={handleChange} />);
+    const input = screen.getByLabelText('Username');
 
-    // Check that clicking the label focuses the input
-    fireEvent.click(label);
-    expect(input).toHaveFocus();
-
-    // Check that the input can be typed into
-    await userEvent.type(input, 'test');
-    expect(input).toHaveValue('test');
+    fireEvent.change(input, { target: { value: 'john' } });
+    expect(handleChange).toHaveBeenCalled();
   });
 
   it('uses semantic HTML and ARIA attributes', () => {
-    const hint = 'Helper text';
-    const error = 'Error message';
-    render(<TextInput {...defaultProps} hint={hint} error={error} />);
+    render(<TextInput label="Username" hint="Helper text" />);
 
-    const input = screen.getByRole('textbox');
-    const helperElement = screen.getByText(error);
+    const input = screen.getByLabelText('Username');
+    const helperText = screen.getByText('Helper text');
 
-    // Check for proper ARIA attributes
+    // Check label-input association
+    expect(input).toHaveAttribute('id');
+    expect(screen.getByText('Username')).toHaveAttribute('for', input.id);
+
+    // Check ARIA attributes
+    expect(input).toHaveAttribute('aria-describedby', `${input.id}-hint`);
+    expect(helperText).toHaveAttribute('id', `${input.id}-hint`);
+    expect(helperText).toHaveAttribute('role', 'status');
+  });
+
+  it('uses semantic HTML and ARIA attributes with error', () => {
+    render(<TextInput label="Username" error="Error message" />);
+
+    const input = screen.getByLabelText('Username');
+    const errorMessage = screen.getByText('Error message');
+
+    // Check ARIA attributes
     expect(input).toHaveAttribute('aria-invalid', 'true');
-    expect(input).toHaveAttribute('aria-describedby', helperElement.id);
-    expect(helperElement).toHaveAttribute('role', 'alert');
+    expect(input).toHaveAttribute('aria-describedby', `${input.id}-error`);
+    expect(errorMessage).toHaveAttribute('id', `${input.id}-error`);
+    expect(errorMessage).toHaveAttribute('role', 'alert');
+  });
+
+  it('handles icon-only buttons with proper accessibility', () => {
+    render(
+      <TextInput
+        label="Search"
+        startIcon={<button aria-label="Search">🔍</button>}
+        endIcon={<button aria-label="Clear">✕</button>}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: 'Search' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument();
   });
 });

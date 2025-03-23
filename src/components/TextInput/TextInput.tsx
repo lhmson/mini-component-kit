@@ -1,11 +1,11 @@
-import React, { forwardRef } from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 export interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   /**
    * Label text for the input
    */
-  label: string;
+  label?: string;
   /**
    * Hint text to display below the input
    */
@@ -24,56 +24,46 @@ export interface TextInputProps extends React.InputHTMLAttributes<HTMLInputEleme
   endIcon?: React.ReactNode;
 }
 
-const InputWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-`;
-
-const Label = styled.label`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  cursor: pointer;
-
-  &:hover {
-    color: #111827;
-  }
-`;
-
-const InputContainer = styled.div<{ hasError?: boolean }>`
+const InputContainer = styled.div<{ $hasError?: boolean; $isFocused?: boolean }>`
   position: relative;
   display: flex;
   align-items: center;
-  border: 1px solid ${({ hasError }) => (hasError ? '#EF4444' : '#D1D5DB')};
+  border: 1px solid #d1d5db;
   border-radius: 0.375rem;
   background-color: white;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s;
+
+  ${({ $hasError }) =>
+    $hasError &&
+    css`
+      border-color: #ef4444;
+      background-color: #fee2e2;
+    `}
+
+  ${({ $isFocused }) =>
+    $isFocused &&
+    css`
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px #dbeafe;
+    `}
 
   &:hover {
-    border-color: ${({ hasError }) => (hasError ? '#EF4444' : '#9CA3AF')};
+    border-color: #9ca3af;
   }
 
   &:focus-within {
-    border-color: ${({ hasError }) => (hasError ? '#EF4444' : '#3B82F6')};
-    box-shadow: 0 0 0 2px ${({ hasError }) => (hasError ? '#FEE2E2' : '#DBEAFE')};
-  }
-
-  &:disabled {
-    background-color: #f3f4f6;
-    border-color: #d1d5db;
-    cursor: not-allowed;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px #dbeafe;
   }
 `;
 
-const StyledInput = styled.input`
+const StyledInput = styled.input<{ $hasError?: boolean }>`
   width: 100%;
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
   color: #111827;
-  background: transparent;
+  background-color: transparent;
   border: none;
   outline: none;
 
@@ -82,70 +72,96 @@ const StyledInput = styled.input`
   }
 
   &:disabled {
-    color: #6b7280;
+    background-color: #f3f4f6;
     cursor: not-allowed;
   }
 
-  /* Remove spinner buttons for number inputs */
-  &::-webkit-inner-spin-button,
-  &::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
+  ${({ $hasError }) =>
+    $hasError &&
+    css`
+      color: #991b1b;
+    `}
 `;
 
-const IconWrapper = styled.div`
+const Label = styled.label`
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+`;
+
+const HelperText = styled.span<{ $hasError?: boolean }>`
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: ${({ $hasError }) => ($hasError ? '#991B1B' : '#6B7280')};
+`;
+
+const IconWrapper = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 0.75rem;
-  color: #6b7280;
-
-  &:first-child {
-    padding-left: 0.75rem;
-  }
-
-  &:last-child {
-    padding-right: 0.75rem;
-  }
+  color: #9ca3af;
 `;
 
-const HelperText = styled.span<{ hasError?: boolean }>`
-  font-size: 0.75rem;
-  color: ${({ hasError }) => (hasError ? '#EF4444' : '#6B7280')};
-`;
+export const TextInput: React.FC<TextInputProps> = ({
+  label,
+  error,
+  hint,
+  startIcon,
+  endIcon,
+  id,
+  disabled,
+  onFocus,
+  onBlur,
+  ...props
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+  const hasError = !!error;
 
-export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ label, hint, error, startIcon, endIcon, id, ...props }, ref) => {
-    const inputId = id || `text-input-${Math.random().toString(36).substr(2, 9)}`;
-    const hasError = !!error;
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true);
+    onFocus?.(e);
+  };
 
-    return (
-      <InputWrapper>
-        <Label htmlFor={inputId}>{label}</Label>
-        <InputContainer hasError={hasError}>
-          {startIcon && <IconWrapper>{startIcon}</IconWrapper>}
-          <StyledInput
-            ref={ref}
-            id={inputId}
-            aria-invalid={hasError}
-            aria-describedby={hint || error ? `${inputId}-description` : undefined}
-            {...props}
-          />
-          {endIcon && <IconWrapper>{endIcon}</IconWrapper>}
-        </InputContainer>
-        {(hint || error) && (
-          <HelperText
-            id={`${inputId}-description`}
-            hasError={hasError}
-            role={hasError ? 'alert' : undefined}
-          >
-            {error || hint}
-          </HelperText>
-        )}
-      </InputWrapper>
-    );
-  }
-);
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(false);
+    onBlur?.(e);
+  };
+
+  return (
+    <div>
+      {label && <Label htmlFor={inputId}>{label}</Label>}
+      <InputContainer $hasError={hasError} $isFocused={isFocused}>
+        {startIcon && <IconWrapper>{startIcon}</IconWrapper>}
+        <StyledInput
+          id={inputId}
+          disabled={disabled}
+          $hasError={hasError}
+          aria-invalid={hasError}
+          aria-describedby={hasError ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          {...props}
+        />
+        {endIcon && <IconWrapper>{endIcon}</IconWrapper>}
+      </InputContainer>
+      {error && (
+        <HelperText id={`${inputId}-error`} role="alert" $hasError={true}>
+          {error}
+        </HelperText>
+      )}
+      {hint && !error && (
+        <HelperText id={`${inputId}-hint`} role="status">
+          {hint}
+        </HelperText>
+      )}
+    </div>
+  );
+};
 
 TextInput.displayName = 'TextInput';

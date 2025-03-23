@@ -78,13 +78,13 @@ const Username = styled.div`
   text-overflow: ellipsis;
 `;
 
-const TestimonialText = styled.p<{ maxLines: number }>`
-  font-size: 0.875rem;
+const TestimonialText = styled.p<{ $maxLines?: number }>`
+  font-size: 1rem;
   line-height: 1.5;
-  color: #374151;
+  color: #4b5563;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: ${({ maxLines }) => maxLines};
+  -webkit-line-clamp: ${({ $maxLines = 3 }) => $maxLines};
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -107,7 +107,7 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({
           <Username>@{username}</Username>
         </ProfileInfo>
       </ProfileSection>
-      <TestimonialText maxLines={maxLines}>{testimonial}</TestimonialText>
+      <TestimonialText $maxLines={maxLines}>{testimonial}</TestimonialText>
     </Card>
   );
 };
