@@ -10,3 +10,5 @@ export { ProfileCard } from './ProfileCard';
 export type { ProfileCardProps, SocialLink } from './ProfileCard';
 export { FeaturedCollections } from './FeaturedCollections';
 export type { FeaturedCollectionsProps, Collection } from './FeaturedCollections';
+export { NewsletterSubscription } from './NewsletterSubscription';
+export type { NewsletterSubscriptionProps } from './NewsletterSubscription';

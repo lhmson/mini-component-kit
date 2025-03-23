@@ -7,6 +7,7 @@ import {
   TestimonialCard,
   ProfileCard,
   FeaturedCollections,
+  NewsletterSubscription,
 } from './components';
 
 const AppContainer = styled.div`
@@ -237,6 +238,11 @@ export const App: React.FC = () => {
       <Section>
         <SectionTitle>Featured Collections</SectionTitle>
         <FeaturedCollections collections={mockCollections} />
+      </Section>
+
+      <Section>
+        <SectionTitle>Newsletter Subscription</SectionTitle>
+        <NewsletterSubscription />
       </Section>
     </AppContainer>
   );
